@@ -3,6 +3,9 @@
 
 @section('content')
 <h1 class="text-2xl font-bold mb-4">Edit Category</h1>
+<!-- Include Alert Messages -->
+@include('layouts.alert')
+
 <form action="{{ route('categories.update', $category->id) }}" method="POST" class="bg-white p-6 rounded shadow-md">
     @csrf
     @method('PUT')

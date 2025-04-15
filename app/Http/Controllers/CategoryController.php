@@ -28,23 +28,39 @@ class CategoryController extends Controller
      * Store a newly created category in storage.
      */
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+    ]);
 
+    try {
         Category::create($validatedData);
         return redirect()->route('categories.index')->with('success', 'Category created successfully.');
+    } catch (\Exception $e) {
+        // Log the error for debugging
+        \Log::error('Failed to save category: ' . $e->getMessage());
+
+        // Redirect back to the create view with an error message
+        return redirect()->route('categories.create')->with('error', 'Failed to create category. Please try again.');
     }
+}
 
     /**
      * Display the specified category.
      */
     public function show($id)
     {
-        $category = Category::findOrFail($id);
-        return view('categories.show', compact('category'));
+        try {
+            $category = Category::findOrFail($id);
+            return view('categories.show', compact('category'));
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to retrieve category: ' . $e->getMessage());
+    
+            // Redirect back to the index view with an error message
+            return redirect()->route('categories.index')->with('error', 'Failed to retrieve category. Please try again.');
+        }
     }
 
     /**
@@ -65,10 +81,18 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-
-        $category = Category::findOrFail($id);
-        $category->update($validatedData);
-        return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
+    
+        try {
+            $category = Category::findOrFail($id);
+            $category->update($validatedData);
+            return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to update category: ' . $e->getMessage());
+    
+            // Redirect back to the edit view with an error message
+            return redirect()->route('categories.edit', $id)->with('error', 'Failed to update category. Please try again.');
+        }
     }
 
     /**
@@ -76,8 +100,16 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
+        try {
+            $category = Category::findOrFail($id);
+            $category->delete();
+            return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to delete category: ' . $e->getMessage());
+    
+            // Redirect back to the index view with an error message
+            return redirect()->route('categories.index')->with('error', 'Failed to delete category. Please try again.');
+        }
     }
 }

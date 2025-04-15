@@ -20,12 +20,17 @@ class BookController extends Controller
 
     public function welcome(Request $request)
     {
-        $search = $request->input('search');
-        $books = Book::when($search, function ($query, $search) {
-            return $query->where('title', 'like', "%{$search}%");
-        })->get();
+        try {
+            $search = $request->input('search');
+            $books = Book::when($search, function ($query, $search) {
+                return $query->where('title', 'like', "%{$search}%");
+            })->get();
 
-        return view('welcome', compact('books', 'search'));
+            return view('welcome', compact('books', 'search'));
+        } catch (\Exception $e) {
+            \Log::error('Failed to load welcome page: ' . $e->getMessage());
+            return redirect()->route('books.index')->with('error', 'Failed to load books. Please try again.');
+        }
     }
 
     /**
@@ -52,13 +57,18 @@ class BookController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('cover_images', 'public');
+        try {
+            if ($request->hasFile('cover_image')) {
+                $validated['cover_image'] = $request->file('cover_image')->store('cover_images', 'public');
+            }
+
+            Book::create($validated);
+
+            return redirect()->route('books.index')->with('success', 'Book created successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to create book: ' . $e->getMessage());
+            return redirect()->route('books.create')->with('error', 'Failed to create book. Please try again.');
         }
-
-        Book::create($validated);
-
-        return redirect()->route('books.index')->with('success', 'Book created successfully.');
     }
 
     /**
@@ -66,7 +76,12 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        return view('books.show', compact('book'));
+        try {
+            return view('books.show', compact('book'));
+        } catch (\Exception $e) {
+            \Log::error('Failed to retrieve book: ' . $e->getMessage());
+            return redirect()->route('books.index')->with('error', 'Failed to retrieve book. Please try again.');
+        }
     }
 
     public function showUser($id)
@@ -99,17 +114,22 @@ class BookController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            // Delete the old cover image if it exists
-            if ($book->cover_image) {
-                Storage::disk('public')->delete($book->cover_image);
+        try {
+            if ($request->hasFile('cover_image')) {
+                // Delete the old cover image if it exists
+                if ($book->cover_image) {
+                    Storage::disk('public')->delete($book->cover_image);
+                }
+                $validated['cover_image'] = $request->file('cover_image')->store('cover_images', 'public');
             }
-            $validated['cover_image'] = $request->file('cover_image')->store('cover_images', 'public');
+
+            $book->update($validated);
+
+            return redirect()->route('books.index')->with('success', 'Book updated successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to update book: ' . $e->getMessage());
+            return redirect()->route('books.edit', $book->id)->with('error', 'Failed to update book. Please try again.');
         }
-
-        $book->update($validated);
-
-        return redirect()->route('books.index')->with('success', 'Book updated successfully.');
     }
 
     /**
@@ -117,13 +137,18 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        // Delete the cover image if it exists
-        if ($book->cover_image) {
-            Storage::disk('public')->delete($book->cover_image);
+        try {
+            // Delete the cover image if it exists
+            if ($book->cover_image) {
+                Storage::disk('public')->delete($book->cover_image);
+            }
+
+            $book->delete();
+
+            return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete book: ' . $e->getMessage());
+            return redirect()->route('books.index')->with('error', 'Failed to delete book. Please try again.');
         }
-
-        $book->delete();
-
-        return redirect()->route('books.index')->with('success', 'Book deleted successfully.');
     }
 }

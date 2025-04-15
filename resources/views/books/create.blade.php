@@ -3,6 +3,9 @@
 @section('content')
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">Add New Book</h1>
+    <!-- Include Alert Messages -->
+@include('layouts.alert')
+
     <form action="{{ route('books.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-4">

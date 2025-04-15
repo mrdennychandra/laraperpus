@@ -3,6 +3,8 @@
 @section('content')
 <div class="container mx-auto p-4">
     <h1 class="text-2xl font-bold mb-4">Edit Book</h1>
+    <!-- Include Alert Messages -->
+@include('layouts.alert')
     <form action="{{ route('books.update', $book->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')

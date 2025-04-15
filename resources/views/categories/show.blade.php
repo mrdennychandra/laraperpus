@@ -2,6 +2,9 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- Include Alert Messages -->
+@include('layouts.alert')
+
 <div class="bg-white p-6 rounded shadow-md">
     <h1 class="text-2xl font-bold mb-4">{{ $category->name }}</h1>
     <p class="text-gray-700"><strong>Description:</strong> {{ $category->description }}</p>
