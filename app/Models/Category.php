@@ -11,4 +11,10 @@ class Category extends Model
         'name',
         'description',
     ];
+
+    //one to many relationship to Book
+    public function books()
+    {
+        return $this->hasMany(Book::class);
+    }
 }

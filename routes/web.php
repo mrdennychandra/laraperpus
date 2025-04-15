@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BookController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,3 +17,5 @@ Route::prefix('categories')->group(function () {
     Route::put('/{id}', [CategoryController::class, 'update'])->name('categories.update'); // Update a category
     Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy'); // Delete a category
 });
+
+Route::resource('books', BookController::class);
