@@ -18,6 +18,16 @@ class BookController extends Controller
         return view('books.index', compact('books'));
     }
 
+    public function welcome(Request $request)
+    {
+        $search = $request->input('search');
+        $books = Book::when($search, function ($query, $search) {
+            return $query->where('title', 'like', "%{$search}%");
+        })->get();
+
+        return view('welcome', compact('books', 'search'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -57,6 +67,12 @@ class BookController extends Controller
     public function show(Book $book)
     {
         return view('books.show', compact('book'));
+    }
+
+    public function showUser($id)
+    {
+        $book = Book::with('category')->findOrFail($id);
+        return view('books.showuser', compact('book'));
     }
 
     /**
