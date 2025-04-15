@@ -43,6 +43,9 @@
                 </button>
             </div>
         @endif
+        @if ($book->cover_image)
+                <img src="{{ asset('storage/' . $book->cover_image) }}" alt="Cover Image" class="w-full mb-4">
+            @endif
             <h2 class="text-lg font-bold mb-2">{{ $book->title }}</h2>
             <p class="text-gray-700 mb-2">Author: {{ $book->author }}</p>
             <p class="text-gray-700 mb-4">{{ Str::limit($book->description, 50) }}</p>

@@ -26,7 +26,7 @@
         </form>
 
         <div class="mt-4">
-            <a href="{{ route('books.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back</a>
+            <button onclick="history.back()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back</button>
         </div>
 
     </div>
